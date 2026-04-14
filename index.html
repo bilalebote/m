@@ -2,51 +2,67 @@
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إلى أنتِ | اعتراف</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>إلى أنتِ | اعتراف حقيقي</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
             background: #0a0c10;
-            font-family: 'Segoe UI', Roboto, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Cairo', sans-serif;
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 1rem;
+            padding: 1.5rem;
         }
         .card {
-            max-width: 650px;
+            max-width: 680px;
+            width: 100%;
             background: #111418;
-            border-radius: 2rem;
+            border-radius: 32px;
             padding: 2rem;
             border: 1px solid #2a2e35;
-            box-shadow: 0 25px 40px rgba(0,0,0,0.5);
+            box-shadow: 0 25px 45px -12px rgba(0,0,0,0.5);
+        }
+        .badge {
+            display: inline-block;
+            background: #1e242c;
+            padding: 0.2rem 1rem;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            color: #8a99b0;
+            margin-bottom: 1.2rem;
         }
         h1 {
+            font-size: 1.7rem;
+            font-weight: 600;
             color: #f1f5f9;
-            font-size: 1.8rem;
-            margin-bottom: 0.5rem;
+            margin-bottom: 1rem;
         }
-        .message {
+        .message-box {
             background: #0f131a;
-            border-radius: 1.5rem;
+            border-radius: 24px;
             padding: 1.5rem;
             margin: 1.5rem 0;
             border-left: 4px solid #3b82f6;
             color: #cbd5e1;
             line-height: 1.6;
+            font-size: 1rem;
         }
         .qualities {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.6rem;
+            gap: 0.5rem;
             margin: 1rem 0;
         }
         .chip {
             background: #1a212b;
             padding: 0.3rem 1rem;
-            border-radius: 2rem;
+            border-radius: 30px;
             font-size: 0.8rem;
             color: #94a3b8;
         }
@@ -54,46 +70,65 @@
             background: #3b82f6;
             width: 100%;
             border: none;
-            padding: 0.8rem;
-            font-weight: bold;
+            padding: 0.9rem;
+            font-weight: 600;
             color: white;
-            border-radius: 2rem;
+            border-radius: 40px;
             font-size: 1rem;
             cursor: pointer;
+            transition: 0.2s;
             margin: 1rem 0;
         }
         button:hover {
             background: #2563eb;
+            transform: scale(0.98);
         }
         .dev-info {
             display: none;
             background: #0c1017;
-            border-radius: 1.2rem;
-            padding: 1rem;
+            border-radius: 20px;
+            padding: 1.2rem;
             margin-top: 1rem;
             border: 1px solid #2d3748;
             font-size: 0.85rem;
             color: #a0afc3;
         }
+        .dev-info p {
+            margin: 0.7rem 0;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        hr {
+            border-color: #252e3b;
+            margin: 1rem 0;
+        }
         footer {
             font-size: 0.7rem;
-            text-align: center;
             color: #5f6c84;
-            margin-top: 1.2rem;
+            text-align: center;
+            margin-top: 1.5rem;
         }
     </style>
 </head>
 <body>
 <div class="card">
-    <h1>💙 إلى بنت</h1>
-    <div class="message">
-        ما أعرف اسمكِ، ولا شفتكِ.<br>
-        لكن كلامك خلاني أحترمك. أنتِ مختلفة.<br>
-        مؤدبة، حساسة، ومحبوبة بدون تصنع.<br><br>
-        فـ حبيتك. يمكن غريب، بس حبيتك.<br>
+    <div class="badge">✧  بدون ألعاب  ✧</div>
+    <h1>إلى بنت 💙</h1>
+
+    <div class="message-box">
+        مع إني ما أعرف اسمك، ولا شفتك،<br>
+        لكن كلامك خلاني أحترمك.<br>
+        أنتِ مختلفة.<br>
+        مؤدبة، حساسة، ومحبوبة بدون ما تتصنعي.<br><br>
+        فـ حبيتك.<br>
+        يمكن غريب، بس حبيتك.<br>
         مو عشان شكلك، عشان أسلوبك.<br><br>
-        <strong>أنا معجب فيكِ، وأتمنى أكون قريب منكِ 🤍</strong>
+        وقلت أجي أقولك بكل وضوح:<br>
+        <strong>“أنا معجب فيكِ، وأتمنى أكون قريب منكِ”</strong> 🤍
     </div>
+
     <div class="qualities">
         <span class="chip">مؤدبة</span>
         <span class="chip">حساسة</span>
@@ -101,18 +136,26 @@
         <span class="chip">كيوت</span>
         <span class="chip">صادقة</span>
     </div>
-    <button id="reveal">👤 من أنا؟</button>
-    <div id="dev" class="dev-info">
-        📞 <span dir="ltr">+212 624-698388</span><br>
-        🔒 ما كتبت اسمي عشان ما أحطك في موقف صعب.<br>
-        أنا رجل وفي كلمتي.
+
+    <button id="revealBtn">👤  من أنا ؟  👤</button>
+
+    <div id="devDetails" class="dev-info">
+        <p>📞 <span dir="ltr">+212 624-698388</span></p>
+        <p>🔒 ما كتبت اسمي لأني ما حبيت أحطك في موقف صعب.<br> 
+           أنا رجل وفي كلمتي، ودي أكون معاكِ لو حبيتي.</p>
+        <hr>
+        <p style="font-size:0.75rem;">📌 لن يتم إزعاجكِ، هذه رسالة تقدير ووضوح.</p>
     </div>
+
     <footer>من شخص اختار الصدق بدل الصمت 🤍</footer>
 </div>
+
 <script>
-    document.getElementById('reveal').onclick = () => {
-        document.getElementById('dev').style.display = 'block';
-        document.getElementById('reveal').style.display = 'none';
+    const btn = document.getElementById('revealBtn');
+    const details = document.getElementById('devDetails');
+    btn.onclick = () => {
+        details.style.display = 'block';
+        btn.style.display = 'none';
     };
 </script>
 </body>
