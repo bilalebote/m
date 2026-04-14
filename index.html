@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إلى أنتِ | اعتراف</title>
+    <style>
+        body {
+            background: #0a0c10;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 1rem;
+        }
+        .card {
+            max-width: 650px;
+            background: #111418;
+            border-radius: 2rem;
+            padding: 2rem;
+            border: 1px solid #2a2e35;
+            box-shadow: 0 25px 40px rgba(0,0,0,0.5);
+        }
+        h1 {
+            color: #f1f5f9;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        .message {
+            background: #0f131a;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border-left: 4px solid #3b82f6;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+        .qualities {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            margin: 1rem 0;
+        }
+        .chip {
+            background: #1a212b;
+            padding: 0.3rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.8rem;
+            color: #94a3b8;
+        }
+        button {
+            background: #3b82f6;
+            width: 100%;
+            border: none;
+            padding: 0.8rem;
+            font-weight: bold;
+            color: white;
+            border-radius: 2rem;
+            font-size: 1rem;
+            cursor: pointer;
+            margin: 1rem 0;
+        }
+        button:hover {
+            background: #2563eb;
+        }
+        .dev-info {
+            display: none;
+            background: #0c1017;
+            border-radius: 1.2rem;
+            padding: 1rem;
+            margin-top: 1rem;
+            border: 1px solid #2d3748;
+            font-size: 0.85rem;
+            color: #a0afc3;
+        }
+        footer {
+            font-size: 0.7rem;
+            text-align: center;
+            color: #5f6c84;
+            margin-top: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h1>💙 إلى بنت</h1>
+    <div class="message">
+        ما أعرف اسمكِ، ولا شفتكِ.<br>
+        لكن كلامك خلاني أحترمك. أنتِ مختلفة.<br>
+        مؤدبة، حساسة، ومحبوبة بدون تصنع.<br><br>
+        فـ حبيتك. يمكن غريب، بس حبيتك.<br>
+        مو عشان شكلك، عشان أسلوبك.<br><br>
+        <strong>أنا معجب فيكِ، وأتمنى أكون قريب منكِ 🤍</strong>
+    </div>
+    <div class="qualities">
+        <span class="chip">مؤدبة</span>
+        <span class="chip">حساسة</span>
+        <span class="chip">محبوبة</span>
+        <span class="chip">كيوت</span>
+        <span class="chip">صادقة</span>
+    </div>
+    <button id="reveal">👤 من أنا؟</button>
+    <div id="dev" class="dev-info">
+        📞 <span dir="ltr">+212 624-698388</span><br>
+        🔒 ما كتبت اسمي عشان ما أحطك في موقف صعب.<br>
+        أنا رجل وفي كلمتي.
+    </div>
+    <footer>من شخص اختار الصدق بدل الصمت 🤍</footer>
+</div>
+<script>
+    document.getElementById('reveal').onclick = () => {
+        document.getElementById('dev').style.display = 'block';
+        document.getElementById('reveal').style.display = 'none';
+    };
+</script>
+</body>
+</html>
