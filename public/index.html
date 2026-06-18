@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>محمل يوتيوب</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #0a0f1e, #1a1a2e);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            background: rgba(20,25,45,0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 28px;
+            padding: 30px;
+            color: #fff;
+        }
+        h1 {
+            text-align: center;
+            background: linear-gradient(45deg, #ff416c, #ff4b2b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 25px;
+        }
+        .input-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 25px;
+        }
+        input, select, button {
+            padding: 14px 20px;
+            border-radius: 50px;
+            font-size: 1em;
+            font-family: inherit;
+        }
+        input {
+            flex: 2;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            outline: none;
+        }
+        select {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            cursor: pointer;
+        }
+        .btn {
+            background: linear-gradient(45deg, #ff416c, #ff4b2b);
+            border: none;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            flex: 1;
+        }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        #downloads-container {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .download-card {
+            background: rgba(0,0,0,0.3);
+            border-radius: 20px;
+            padding: 20px;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .progress-bar {
+            background: rgba(255,255,255,0.1);
+            height: 8px;
+            border-radius: 10px;
+            margin: 12px 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff416c, #ff4b2b);
+            transition: width 0.3s;
+        }
+        .download-link {
+            display: inline-block;
+            background: #2ed573;
+            color: #111;
+            padding: 12px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .error-message { color: #ff4757; margin-top: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎬 محمل يوتيوب</h1>
+        <div class="input-row">
+            <input type="text" id="urlInput" placeholder="أدخل رابط يوتيوب هنا..." />
+            <select id="formatSelect">
+                <option value="mp4">فيديو MP4</option>
+                <option value="mp3">صوت MP3</option>
+            </select>
+            <button class="btn" id="startBtn">بدء التحميل</button>
+        </div>
+        <div id="downloads-container"></div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const urlInput = document.getElementById('urlInput');
+        const formatSelect = document.getElementById('formatSelect');
+        const startBtn = document.getElementById('startBtn');
+        const container = document.getElementById('downloads-container');
+        const activeDownloads = new Map();
+
+        // استعادة التحميلات عند فتح الصفحة
+        async function restoreDownloads() {
+            try {
+                const res = await fetch('/api/downloads');
+                if (!res.ok) return;
+                const downloads = await res.json();
+                for (const dl of downloads) {
+                    createDownloadCard(dl.id);
+                    const card = activeDownloads.get(dl.id);
+                    if (dl.status === 'completed') {
+                        updateCardComplete(dl.id, dl.filename, dl.fileSize, dl.downloadUrl);
+                    } else if (dl.status === 'downloading') {
+                        // جاري التحميل - سنعتمد على تحديثات Socket لاحقاً
+                    }
+                    if (dl.percent) {
+                        const fill = document.getElementById(`progress-${dl.id}`);
+                        if (fill) fill.style.width = dl.percent + '%';
+                    }
+                }
+            } catch (e) {}
+        }
+        restoreDownloads();
+
+        startBtn.addEventListener('click', async () => {
+            const url = urlInput.value.trim();
+            const format = formatSelect.value;
+            if (!url) return alert('الرجاء إدخال رابط يوتيوب');
+            const youtubeRegex = /^(https?:\/\/)?(www\.|m\.|music\.)?(youtube\.com|youtu\.be)\//;
+            if (!youtubeRegex.test(url)) return alert('رابط يوتيوب غير صالح');
+
+            startBtn.disabled = true;
+            startBtn.textContent = 'جاري...';
+
+            try {
+                const res = await fetch('/api/download', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url, format })
+                });
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.error || 'فشل الطلب');
+                }
+                const data = await res.json();
+                if (data.status === 'error') {
+                    throw new Error(data.error);
+                }
+            } catch (err) {
+                alert('خطأ: ' + err.message);
+            } finally {
+                startBtn.disabled = false;
+                startBtn.textContent = 'بدء التحميل';
+                urlInput.value = '';
+            }
+        });
+
+        function createDownloadCard(id) {
+            if (activeDownloads.has(id)) return;
+            const card = document.createElement('div');
+            card.className = 'download-card';
+            card.id = `card-${id}`;
+            card.innerHTML = `
+                <div><strong>تحميل #${id.slice(0,6)}</strong></div>
+                <div class="progress-bar"><div class="progress-fill" id="progress-${id}"></div></div>
+                <div id="status-${id}">⏳ في الطابور...</div>
+                <div id="actions-${id}"></div>
+            `;
+            container.prepend(card);
+            activeDownloads.set(id, card);
+        }
+
+        socket.on('download-start', (data) => {
+            createDownloadCard(data.id);
+            const status = document.getElementById(`status-${data.id}`);
+            if (status) {
+                status.textContent = data.queuePosition ? `⏳ في الطابور (المركز ${data.queuePosition})` : '⚡ جاري التحميل...';
+            }
+        });
+
+        socket.on('queue-position', (data) => {
+            const status = document.getElementById(`status-${data.id}`);
+            if (status) status.textContent = `⏳ في الطابور (المركز ${data.position})`;
+        });
+
+        socket.on('download-progress', (data) => {
+            const card = activeDownloads.get(data.id);
+            if (!card) return;
+            const fill = document.getElementById(`progress-${data.id}`);
+            const status = document.getElementById(`status-${data.id}`);
+            if (fill) fill.style.width = data.percent + '%';
+            if (status) status.textContent = `⏳ ${data.percent}%`;
+        });
+
+        socket.on('download-complete', (data) => {
+            updateCardComplete(data.id, data.filename, data.fileSize, data.downloadUrl);
+        });
+
+        function updateCardComplete(id, filename, fileSize, downloadUrl) {
+            const card = activeDownloads.get(id);
+            if (!card) return;
+            document.getElementById(`progress-${id}`).style.width = '100%';
+            document.getElementById(`status-${id}`).textContent = `✅ مكتمل (${formatBytes(fileSize)})`;
+            const actions = document.getElementById(`actions-${id}`);
+            actions.innerHTML = '';
+            const downloadLink = document.createElement('a');
+            downloadLink.className = 'download-link';
+            downloadLink.href = downloadUrl;
+            downloadLink.download = filename;
+            downloadLink.textContent = '📥 تحميل الآن';
+            actions.appendChild(downloadLink);
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'btn';
+            deleteBtn.style.cssText = 'margin-right:8px;padding:10px 20px;';
+            deleteBtn.textContent = 'تم التحميل';
+            deleteBtn.addEventListener('click', () => markAsDownloaded(id));
+            actions.appendChild(deleteBtn);
+        }
+
+        socket.on('download-error', (data) => {
+            const card = activeDownloads.get(data.id);
+            if (!card) return;
+            const status = document.getElementById(`status-${data.id}`);
+            if (status) {
+                status.classList.add('error-message');
+                status.textContent = `❌ ${data.error}`;
+            }
+        });
+
+        socket.on('download-deleted', (data) => {
+            const card = activeDownloads.get(data.id);
+            if (card) {
+                card.style.opacity = '0.4';
+                const status = document.getElementById(`status-${data.id}`);
+                if (status) status.textContent = '🗑️ تم حذفه من الخادم';
+            }
+        });
+
+        async function markAsDownloaded(id) {
+            try {
+                await fetch(`/api/delete/${id}`, { method: 'POST' });
+            } catch (e) {
+                alert('فشل إبلاغ الخادم');
+            }
+        }
+
+        socket.on('disconnect', () => {
+            const msg = document.createElement('div');
+            msg.textContent = '⚠️ انقطع الاتصال بالخادم';
+            msg.style.color = '#ff4757';
+            container.prepend(msg);
+            setTimeout(() => msg.remove(), 5000);
+        });
+
+        function formatBytes(bytes) {
+            if (!bytes) return '0 بايت';
+            const k = 1024;
+            const sizes = ['بايت', 'ك.ب', 'م.ب', 'ج.ب'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+    </script>
+</body>
+</html>
